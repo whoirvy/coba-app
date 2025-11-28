@@ -27,18 +27,24 @@
 
 <body class="bg-gray-50 text-gray-800 pb-24">
 
-    <!-- === NAVBAR === -->
+    <!-- ========================================= -->
+    <!-- BAGIAN 1: TAMPILAN UI (HTML)              -->
+    <!-- ========================================= -->
+
+    <!-- NAVBAR -->
     <nav class="bg-white shadow-sm sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
                 <div class="bg-emerald-600 text-white p-1.5 rounded-lg"><i class="fas fa-book-open"></i></div>
                 <span class="font-bold text-lg text-emerald-900">KampusBook</span>
             </div>
-            <div id="auth-container"></div>
+            <div id="auth-container">
+                <!-- Tombol Login akan muncul di sini -->
+            </div>
         </div>
     </nav>
 
-    <!-- === HERO SECTION === -->
+    <!-- HERO SECTION (Header Hijau) -->
     <header class="bg-emerald-600 text-white pt-10 pb-16 px-4 rounded-b-[2rem] md:rounded-b-[3rem] shadow-md -mb-10 relative z-0">
         <div class="max-w-4xl mx-auto text-center">
             <h1 class="text-3xl md:text-4xl font-bold mb-2">Bursa Buku Mahasiswa</h1>
@@ -51,49 +57,85 @@
         </div>
     </header>
 
-    <!-- === LIST BUKU === -->
+    <!-- LIST BUKU (KONTEN UTAMA) -->
     <main class="max-w-6xl mx-auto px-4 mt-14 relative z-10">
         <div class="flex justify-between items-center mb-6">
             <h2 class="font-bold text-xl text-gray-800 border-l-4 border-emerald-500 pl-3">Katalog Terbaru</h2>
-            <button onclick="renderBooks()" class="text-sm text-emerald-600 font-bold hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition"><i class="fas fa-sync mr-1"></i> Refresh</button>
+            <button onclick="renderBooks()" class="text-sm text-emerald-600 font-bold hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition">
+                <i class="fas fa-sync mr-1"></i> Refresh
+            </button>
         </div>
-        <div id="loading" class="flex justify-center py-20 hidden"><div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div></div>
-        <div id="book-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-10"></div>
+        
+        <!-- Loading Indicator -->
+        <div id="loading" class="flex justify-center py-20 hidden">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div>
+        </div>
+
+        <!-- Grid Container Buku -->
+        <div id="book-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-10">
+            <!-- Item buku akan dimasukkan lewat Javascript -->
+        </div>
     </main>
 
-    <!-- === TOMBOL FLOATING (JUAL) === -->
+    <!-- TOMBOL FLOATING (JUAL BUKU) -->
     <div class="fixed bottom-8 right-8 z-30" id="btn-add-book" style="display: none;">
         <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center transition transform hover:scale-110 active:scale-95 group">
             <i class="fas fa-plus text-xl md:text-2xl group-hover:rotate-90 transition duration-300"></i>
         </button>
     </div>
 
-    <!-- === MODAL JUAL/EDIT === -->
+    <!-- MODAL 1: FORM JUAL/EDIT BUKU -->
     <div id="modal-add" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative modal-enter">
             <div class="flex justify-between items-center mb-5 border-b pb-3">
                 <h3 id="modal-title" class="font-bold text-xl text-gray-800">Jual Buku Baru</h3>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
             </div>
+            
             <form id="form-jual" onsubmit="handleFormSubmit(event)">
                 <div class="space-y-4">
-                    <div><label class="text-xs font-bold text-gray-500">Judul</label><input type="text" id="input-title" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required></div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="col-span-2"><label class="text-xs font-bold text-gray-500">Harga (Rp)</label><input type="number" id="input-price" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
-                        <div><label class="text-xs font-bold text-gray-500">Stok</label><input type="number" id="input-stock" value="1" min="1" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">Judul Buku</label>
+                        <input type="text" id="input-title" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
                     </div>
-                    <div><label class="text-xs font-bold text-gray-500">WhatsApp (628..)</label><input type="text" id="input-wa" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
-                    <div><label class="text-xs font-bold text-gray-500">Deskripsi</label><textarea id="input-desc" class="w-full border p-2.5 rounded-lg text-sm outline-none" rows="3" required></textarea></div>
-                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100"><label class="text-xs font-bold text-blue-800">URL Foto</label><input type="url" id="input-image" class="w-full border p-2 rounded text-sm bg-white" required><p class="text-[10px] text-blue-600 mt-1">*Copy Image Address dari Google.</p></div>
+                    
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="col-span-2">
+                            <label class="text-xs font-bold text-gray-500">Harga (Rp)</label>
+                            <input type="number" id="input-price" class="w-full border p-2.5 rounded-lg text-sm outline-none" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-500">Stok</label>
+                            <input type="number" id="input-stock" value="1" min="1" class="w-full border p-2.5 rounded-lg text-sm outline-none" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">WhatsApp (628..)</label>
+                        <input type="text" id="input-wa" class="w-full border p-2.5 rounded-lg text-sm outline-none" required>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">Deskripsi</label>
+                        <textarea id="input-desc" class="w-full border p-2.5 rounded-lg text-sm outline-none" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <label class="text-xs font-bold text-blue-800">URL Foto (Link Gambar)</label>
+                        <input type="url" id="input-image" class="w-full border p-2 rounded text-sm bg-white" required>
+                        <p class="text-[10px] text-blue-600 mt-1">*Copy Image Address dari Google Images.</p>
+                    </div>
                 </div>
+
                 <button type="submit" id="btn-submit-form" class="w-full mt-6 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition shadow-lg">Posting</button>
             </form>
         </div>
     </div>
 
-    <!-- === MODAL DETAIL & DISKUSI (REALTIME) === -->
+    <!-- MODAL 2: DETAIL BUKU & DISKUSI (REALTIME) -->
     <div id="modal-detail" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center pointer-events-none">
         <div class="absolute inset-0 bg-black bg-opacity-60 pointer-events-auto transition-opacity backdrop-blur-sm" onclick="closeDetail()"></div>
+        
         <div class="bg-white w-full max-w-4xl h-[90vh] sm:h-[85vh] sm:rounded-2xl rounded-t-3xl shadow-2xl relative pointer-events-auto flex flex-col sm:flex-row overflow-hidden modal-enter">
             
             <!-- Kiri: Info Buku -->
@@ -102,18 +144,36 @@
                     <img id="detail-img" src="" class="w-full h-full object-cover">
                     <button onclick="closeDetail()" class="absolute top-4 left-4 sm:hidden w-8 h-8 rounded-full bg-white/80 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
                 </div>
+                
                 <div class="p-6 flex-1">
-                    <div class="flex justify-between items-start mb-2"><span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded">BUKU BEKAS</span><span id="detail-stock" class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-1 rounded">Stok: 1</span></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded">BUKU BEKAS</span>
+                        <span id="detail-stock" class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-1 rounded">Stok: 1</span>
+                    </div>
+                    
                     <h2 id="detail-title" class="text-2xl font-bold text-gray-900 leading-tight mb-2">Judul</h2>
                     <p id="detail-price" class="text-3xl font-bold text-emerald-600 mb-4">Rp 0</p>
+                    
                     <div class="flex items-center gap-3 mb-6 bg-white p-3 rounded-xl border shadow-sm">
                         <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"><i class="fas fa-user text-gray-500"></i></div>
-                        <div><p class="text-xs text-gray-500">Penjual</p><p id="detail-seller" class="font-bold text-gray-800 text-sm">Nama</p></div>
+                        <div>
+                            <p class="text-xs text-gray-500">Penjual</p>
+                            <p id="detail-seller" class="font-bold text-gray-800 text-sm">Nama</p>
+                        </div>
                     </div>
-                    <div class="prose prose-sm text-gray-600 mb-6"><h4 class="font-bold text-gray-900 mb-1">Deskripsi</h4><p id="detail-desc" class="whitespace-pre-line">...</p></div>
+
+                    <div class="prose prose-sm text-gray-600 mb-6">
+                        <h4 class="font-bold text-gray-900 mb-1">Deskripsi</h4>
+                        <p id="detail-desc" class="whitespace-pre-line">...</p>
+                    </div>
+
                     <div id="detail-actions" class="mt-auto space-y-3">
-                        <a id="btn-wa" href="#" target="_blank" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg transition"><i class="fab fa-whatsapp text-lg mr-1"></i> Hubungi Penjual</a>
-                        <div id="owner-actions" class="grid grid-cols-2 gap-2 hidden"></div>
+                        <a id="btn-wa" href="#" target="_blank" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg transition">
+                            <i class="fab fa-whatsapp text-lg mr-1"></i> Hubungi Penjual
+                        </a>
+                        <div id="owner-actions" class="grid grid-cols-2 gap-2 hidden">
+                            <!-- Tombol Edit/Hapus muncul di sini -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,27 +203,49 @@
         </div>
     </div>
 
-    <!-- === MODAL EDIT PROFIL === -->
+    <!-- MODAL 3: EDIT PROFIL -->
     <div id="modal-profile" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl relative modal-enter">
-            <div class="flex justify-between items-center mb-5 border-b pb-3"><h3 class="font-bold text-xl text-gray-800">Profil Saya</h3><button onclick="closeProfileModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:text-red-500 flex items-center justify-center"><i class="fas fa-times"></i></button></div>
-            <div class="flex flex-col items-center mb-6"><img id="profile-preview" src="" class="w-20 h-20 rounded-full border-2 border-emerald-500 object-cover shadow-md mb-2"><p id="profile-email" class="text-xs text-gray-500">email</p></div>
+            <div class="flex justify-between items-center mb-5 border-b pb-3">
+                <h3 class="font-bold text-xl text-gray-800">Profil Saya</h3>
+                <button onclick="closeProfileModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:text-red-500 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="flex flex-col items-center mb-6">
+                <img id="profile-preview" src="" class="w-20 h-20 rounded-full border-2 border-emerald-500 object-cover shadow-md mb-2">
+                <p id="profile-email" class="text-xs text-gray-500">email@example.com</p>
+            </div>
+
             <form onsubmit="updateUserProfile(event)" class="space-y-4">
-                <div><label class="text-xs font-bold text-gray-500">Nama</label><input type="text" id="profile-name" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
-                <div><label class="text-xs font-bold text-gray-500">URL Foto</label><input type="url" id="profile-photo" class="w-full border p-2.5 rounded-lg text-sm outline-none"></div>
-                <button type="submit" id="btn-save-profile" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition">Simpan</button>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Nama Tampilan</label>
+                    <input type="text" id="profile-name" class="w-full border p-2.5 rounded-lg text-sm outline-none" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">URL Foto Profil</label>
+                    <input type="url" id="profile-photo" class="w-full border p-2.5 rounded-lg text-sm outline-none">
+                </div>
+                <button type="submit" id="btn-save-profile" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition">
+                    Simpan Perubahan
+                </button>
             </form>
-            <button onclick="logout()" class="w-full mt-3 py-2.5 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">Logout</button>
+
+            <button onclick="logout()" class="w-full mt-3 py-2.5 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">
+                Logout / Keluar
+            </button>
         </div>
     </div>
 
-    <!-- === JAVASCRIPT === -->
+    <!-- ========================================= -->
+    <!-- BAGIAN 2: LOGIKA PROGRAM (JAVASCRIPT)     -->
+    <!-- ========================================= -->
     <script type="module">
+        // Import Library Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, orderBy, where, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- PASTE CONFIG FIREBASE ANDA DISINI ---
+        // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyCc7QR0H2NwywGX2ld3f-CQOwxo39WWu08",
             authDomain: "campusbook-416b9.firebaseapp.com",
@@ -173,93 +255,169 @@
             appId: "1:275967713352:web:64949d004a355e84ecb87d"
         };
 
+        // Inisialisasi Aplikasi
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // Variabel Global
         let currentUser = null;
         let booksCache = []; 
         let activeBookId = null;
         let editingBookId = null; 
-        let unsubscribeComments = null;
+        let unsubscribeComments = null; // Untuk mematikan listener chat
 
-        // --- AUTH ---
-        window.loginGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message) } };
-        window.logout = () => { if(confirm("Yakin logout?")) { signOut(auth); location.reload(); } };
+        // --- FUNGSI LOGIN & LOGOUT ---
+        window.loginGoogle = async () => { 
+            try { 
+                await signInWithPopup(auth, provider); 
+            } catch(e) { 
+                alert("Error Login: " + e.message); 
+            } 
+        };
+        
+        window.logout = () => { 
+            if(confirm("Yakin ingin logout?")) { 
+                signOut(auth); 
+                location.reload(); 
+            } 
+        };
 
+        // Cek Status Login Pengguna
         onAuthStateChanged(auth, (user) => {
             const container = document.getElementById('auth-container');
             const btnAdd = document.getElementById('btn-add-book');
+            
             if (user) {
                 currentUser = user;
-                container.innerHTML = `<div onclick="openProfileModal()" class="flex items-center gap-3 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 transition"><div class="text-right hidden md:block"><p class="text-xs font-bold text-emerald-900">${user.displayName.split(' ')[0]}</p><p class="text-[10px] text-emerald-600">Edit Profil</p></div><img src="${user.photoURL}" class="w-8 h-8 rounded-full border-2 border-white object-cover"></div>`;
+                // Tampilkan Profil User di Navbar
+                container.innerHTML = `
+                    <div onclick="openProfileModal()" class="flex items-center gap-3 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 transition">
+                        <div class="text-right hidden md:block">
+                            <p class="text-xs font-bold text-emerald-900">${user.displayName.split(' ')[0]}</p>
+                            <p class="text-[10px] text-emerald-600">Edit Profil</p>
+                        </div>
+                        <img src="${user.photoURL}" class="w-8 h-8 rounded-full border-2 border-white object-cover">
+                    </div>`;
                 btnAdd.style.display = 'block';
             } else {
                 currentUser = null;
-                container.innerHTML = `<button onclick="loginGoogle()" class="text-sm font-bold text-white bg-emerald-600 px-5 py-2 rounded-full hover:bg-emerald-700 shadow-lg"><i class="fab fa-google mr-2"></i> Masuk</button>`;
+                // Tampilkan Tombol Login
+                container.innerHTML = `
+                    <button onclick="loginGoogle()" class="text-sm font-bold text-white bg-emerald-600 px-5 py-2 rounded-full hover:bg-emerald-700 shadow-lg">
+                        <i class="fab fa-google mr-2"></i> Masuk
+                    </button>`;
                 btnAdd.style.display = 'none';
             }
         });
 
-        // --- BOOKS ---
+        // --- FUNGSI TAMPILKAN BUKU (RENDER) ---
         window.renderBooks = async () => {
             const list = document.getElementById('book-list');
             const loader = document.getElementById('loading');
-            list.innerHTML = ''; loader.classList.remove('hidden');
+            
+            list.innerHTML = ''; 
+            loader.classList.remove('hidden');
+
             try {
+                // Ambil data buku dari Firestore
                 const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
                 const snap = await getDocs(q);
+                
                 loader.classList.add('hidden');
-                booksCache = [];
-                if (snap.empty) { list.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">Belum ada buku.</div>`; return; }
+                booksCache = []; 
+
+                if (snap.empty) { 
+                    list.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">Belum ada buku yang dijual.</div>`; 
+                    return; 
+                }
+
                 snap.forEach((docSnap) => {
-                    const b = docSnap.data(); const id = docSnap.id; booksCache.push({ id, ...b });
-                    const stk = b.stock > 0 ? `<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Stok: ${b.stock}</span>` : `<span class="text-[10px] text-white bg-red-500 px-2 py-1 rounded-full">Habis</span>`;
-                    list.innerHTML += `<div onclick="openDetail('${id}')" class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer border flex flex-col h-full group"><div class="aspect-[3/4] bg-gray-100 rounded-xl mb-3 overflow-hidden relative"><img src="${b.image}" onerror="this.src='https://placehold.co/400x600?text=No+Image'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></div><h3 class="font-bold text-sm text-gray-800 line-clamp-2 mb-1 group-hover:text-emerald-600">${b.title}</h3><p class="text-xs text-gray-500 mb-2 truncate">${b.sellerName}</p><div class="mt-auto flex justify-between items-center pt-2 border-t">${stk}<span class="text-emerald-600 font-bold text-sm">Rp ${parseInt(b.price).toLocaleString('id-ID')}</span></div></div>`;
+                    const b = docSnap.data(); 
+                    const id = docSnap.id; 
+                    booksCache.push({ id, ...b }); // Simpan ke cache lokal
+
+                    // Tentukan badge stok
+                    const stk = b.stock > 0 
+                        ? `<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Stok: ${b.stock}</span>` 
+                        : `<span class="text-[10px] text-white bg-red-500 px-2 py-1 rounded-full">Habis</span>`;
+
+                    // Generate HTML Card Buku
+                    list.innerHTML += `
+                        <div onclick="openDetail('${id}')" class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer border flex flex-col h-full group">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl mb-3 overflow-hidden relative">
+                                <img src="${b.image}" onerror="this.src='https://placehold.co/400x600?text=No+Image'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            </div>
+                            <h3 class="font-bold text-sm text-gray-800 line-clamp-2 mb-1 group-hover:text-emerald-600">${b.title}</h3>
+                            <p class="text-xs text-gray-500 mb-2 truncate">${b.sellerName}</p>
+                            <div class="mt-auto flex justify-between items-center pt-2 border-t">
+                                ${stk}
+                                <span class="text-emerald-600 font-bold text-sm">Rp ${parseInt(b.price).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>`;
                 });
-            } catch (e) { console.error(e); loader.classList.add('hidden'); }
+            } catch (e) { 
+                console.error(e); 
+                loader.classList.add('hidden'); 
+            }
         };
 
-        // --- DETAIL & REALTIME CHAT (FIXED) ---
+        // --- FUNGSI BUKA DETAIL BUKU ---
         window.openDetail = (id) => {
             activeBookId = id;
             const b = booksCache.find(x => x.id === id);
             if(!b) return;
 
+            // Isi Data ke Modal Detail
             document.getElementById('detail-img').src = b.image;
             document.getElementById('detail-title').innerText = b.title;
             document.getElementById('detail-price').innerText = `Rp ${parseInt(b.price).toLocaleString('id-ID')}`;
             document.getElementById('detail-desc').innerText = b.desc;
             document.getElementById('detail-seller').innerText = b.sellerName;
             document.getElementById('detail-stock').innerText = `Stok: ${b.stock || 1}`;
-            document.getElementById('btn-wa').href = `https://wa.me/${b.wa}?text=Halo, tertarik buku: ${b.title}`;
+            document.getElementById('btn-wa').href = `https://wa.me/${b.wa}?text=Halo, saya tertarik buku: ${b.title}`;
 
+            // Cek apakah user adalah pemilik buku ini
             const actions = document.getElementById('owner-actions');
-            actions.innerHTML = ''; actions.classList.add('hidden');
+            actions.innerHTML = ''; 
+            actions.classList.add('hidden');
+            
             if (currentUser && b.sellerId === currentUser.uid) {
                 actions.classList.remove('hidden');
-                actions.innerHTML = `<button onclick="openEditModal('${id}')" class="w-full border border-blue-200 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-50 text-sm flex items-center justify-center gap-2"><i class="fas fa-edit"></i> Edit</button><button onclick="deleteBook('${id}')" class="w-full border border-red-200 text-red-500 py-3 rounded-xl font-bold hover:bg-red-50 text-sm flex items-center justify-center gap-2"><i class="fas fa-trash"></i> Hapus</button>`;
+                actions.innerHTML = `
+                    <button onclick="openEditModal('${id}')" class="w-full border border-blue-200 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-50 text-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button onclick="deleteBook('${id}')" class="w-full border border-red-200 text-red-500 py-3 rounded-xl font-bold hover:bg-red-50 text-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>`;
             }
+
             document.getElementById('modal-detail').classList.remove('hidden', 'pointer-events-none');
+            
+            // Panggil Fungsi Chat Realtime
             loadCommentsRealtime(id);
         };
 
         window.closeDetail = () => {
             document.getElementById('modal-detail').classList.add('hidden', 'pointer-events-none');
             activeBookId = null;
+            // Matikan listener chat agar hemat kuota
             if (unsubscribeComments) { unsubscribeComments(); unsubscribeComments = null; }
         };
 
-        // --- LOGIKA CHAT WA-STYLE ---
+        // --- LOGIKA CHAT REALTIME (WA-STYLE) ---
         function loadCommentsRealtime(bookId) {
             const container = document.getElementById('comments-list');
             container.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Memuat diskusi...</div>';
 
-            if (unsubscribeComments) unsubscribeComments();
+            if (unsubscribeComments) unsubscribeComments(); // Reset listener sebelumnya
 
+            // Query: Ambil komentar buku ini
             const q = query(collection(db, "comments"), where("bookId", "==", bookId));
 
+            // onSnapshot: Mendengarkan perubahan data secara langsung (Live)
             unsubscribeComments = onSnapshot(q, (snap) => {
                 container.innerHTML = '';
                 if(snap.empty) {
@@ -270,7 +428,7 @@
                 const comments = [];
                 snap.forEach(doc => comments.push({ id: doc.id, ...doc.data() }));
                 
-                // FIX: Menangani Timestamp yang null saat pertama kirim (Local Latency)
+                // Sorting Manual di Client (Mengatasi delay timestamp server)
                 comments.sort((a, b) => {
                     const timeA = a.createdAt ? a.createdAt.toMillis() : Date.now();
                     const timeB = b.createdAt ? b.createdAt.toMillis() : Date.now();
@@ -298,18 +456,21 @@
                         </div>`;
                 });
                 
-                // AUTO SCROLL KE BAWAH
+                // Auto Scroll ke Bawah
                 setTimeout(() => container.scrollTop = container.scrollHeight, 50);
             });
         }
 
-        // --- SEND WITH ENTER KEY ---
-        document.getElementById('input-comment').addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                postComment();
-            }
-        });
+        // --- KIRIM PESAN DENGAN TOMBOL ENTER ---
+        const inputComment = document.getElementById('input-comment');
+        if (inputComment) {
+            inputComment.addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault(); 
+                    window.postComment();   
+                }
+            });
+        }
 
         window.postComment = async () => {
             if(!currentUser) return alert("Login dulu!");
@@ -317,50 +478,158 @@
             const text = input.value.trim();
             if(!text) return;
             
-            // Langsung kosongkan input agar terasa cepat (Optimistic UI)
+            // Kosongkan input segera agar responsif
             input.value = ''; 
             input.focus();
 
             try {
                 await addDoc(collection(db, "comments"), {
-                    bookId: activeBookId, userId: currentUser.uid, userName: currentUser.displayName,
-                    photo: currentUser.photoURL, text: text, createdAt: serverTimestamp()
+                    bookId: activeBookId, 
+                    userId: currentUser.uid, 
+                    userName: currentUser.displayName,
+                    photo: currentUser.photoURL, 
+                    text: text, 
+                    createdAt: serverTimestamp()
                 });
-            } catch (e) { alert("Gagal kirim"); }
+            } catch (e) { alert("Gagal kirim pesan"); }
         };
 
-        // --- CRUD LAINNYA ---
-        window.deleteComment = async (id) => { if(confirm("Hapus?")) await deleteDoc(doc(db, "comments", id)); };
-        window.deleteBook = async (id) => { if(confirm("Hapus buku?")) { await deleteDoc(doc(db, "books", id)); closeDetail(); renderBooks(); }};
+        // --- CRUD LAINNYA (Hapus Komentar & Buku) ---
+        window.deleteComment = async (id) => { 
+            if(confirm("Hapus komentar ini?")) await deleteDoc(doc(db, "comments", id)); 
+        };
         
+        window.deleteBook = async (id) => { 
+            if(confirm("Hapus buku ini permanen?")) { 
+                await deleteDoc(doc(db, "books", id)); 
+                closeDetail(); 
+                renderBooks(); 
+            }
+        };
+        
+        // --- LOGIKA FORM JUAL / EDIT BUKU ---
         window.handleFormSubmit = async (e) => {
-            e.preventDefault(); if(!currentUser) return alert("Login!");
-            const vals = ['title', 'price', 'stock', 'desc', 'wa', 'image'].map(id => document.getElementById('input-'+id).value);
-            let wa = vals[4].replace(/\D/g,''); if(wa.startsWith('0')) wa = '62'+wa.substring(1);
-            const d = { title: vals[0], price: Number(vals[1]), stock: Number(vals[2]), desc: vals[3], wa, image: vals[5], sellerId: currentUser.uid, sellerName: currentUser.displayName, updatedAt: serverTimestamp() };
-            try { editingBookId ? await updateDoc(doc(db, "books", editingBookId), d) : (d.createdAt=serverTimestamp(), await addDoc(collection(db, "books"), d)); closeModal(); renderBooks(); } catch(e) { alert(e.message); }
+            e.preventDefault(); 
+            if(!currentUser) return alert("Login dulu!");
+            
+            const title = document.getElementById('input-title').value;
+            const price = Number(document.getElementById('input-price').value);
+            const stock = Number(document.getElementById('input-stock').value);
+            const desc = document.getElementById('input-desc').value;
+            const image = document.getElementById('input-image').value;
+            let wa = document.getElementById('input-wa').value;
+            
+            // Format WA 08xx -> 628xx
+            wa = wa.replace(/\D/g,''); 
+            if(wa.startsWith('0')) wa = '62'+wa.substring(1);
+
+            const bookData = { 
+                title, price, stock, desc, wa, image, 
+                sellerId: currentUser.uid, 
+                sellerName: currentUser.displayName, 
+                updatedAt: serverTimestamp() 
+            };
+
+            try { 
+                if (editingBookId) { 
+                    // Mode Edit
+                    await updateDoc(doc(db, "books", editingBookId), bookData); 
+                    alert("Buku berhasil diperbarui!"); 
+                } else { 
+                    // Mode Baru
+                    bookData.createdAt = serverTimestamp(); 
+                    await addDoc(collection(db, "books"), bookData); 
+                    alert("Buku berhasil diposting!"); 
+                }
+                closeModal(); 
+                renderBooks(); 
+            } catch(e) { 
+                alert("Error: " + e.message); 
+            }
         };
 
-        // --- PROFILE UPDATE (BATCH) ---
-        window.openProfileModal = () => { document.getElementById('profile-name').value=currentUser.displayName; document.getElementById('profile-photo').value=currentUser.photoURL; document.getElementById('profile-preview').src=currentUser.photoURL; document.getElementById('profile-email').innerText=currentUser.email; document.getElementById('modal-profile').classList.remove('hidden'); };
+        // --- MANAJEMEN MODAL & PROFIL ---
+        window.openProfileModal = () => { 
+            document.getElementById('profile-name').value = currentUser.displayName; 
+            document.getElementById('profile-photo').value = currentUser.photoURL; 
+            document.getElementById('profile-preview').src = currentUser.photoURL; 
+            document.getElementById('profile-email').innerText = currentUser.email; 
+            document.getElementById('modal-profile').classList.remove('hidden'); 
+        };
+        
         window.closeProfileModal = () => document.getElementById('modal-profile').classList.add('hidden');
-        window.openAddModal = () => { editingBookId=null; document.getElementById('form-jual').reset(); document.getElementById('modal-add').classList.remove('hidden'); };
+        
+        window.openAddModal = () => { 
+            editingBookId = null; 
+            document.getElementById('form-jual').reset(); 
+            document.getElementById('modal-title').innerText = "Jual Buku Baru";
+            document.getElementById('btn-submit-form').innerText = "Posting Sekarang";
+            document.getElementById('modal-add').classList.remove('hidden'); 
+        };
+        
         window.closeModal = () => document.getElementById('modal-add').classList.add('hidden');
-        window.openEditModal = (id) => { closeDetail(); editingBookId=id; const b=booksCache.find(x=>x.id==id); document.getElementById('input-title').value=b.title; document.getElementById('input-price').value=b.price; document.getElementById('input-stock').value=b.stock; document.getElementById('input-desc').value=b.desc; document.getElementById('input-wa').value=b.wa; document.getElementById('input-image').value=b.image; document.getElementById('modal-add').classList.remove('hidden'); };
-
-        window.updateUserProfile = async (e) => {
-            e.preventDefault(); const btn=document.getElementById('btn-save-profile'); btn.innerText="Menyimpan...";
-            try {
-                const name=document.getElementById('profile-name').value; const photo=document.getElementById('profile-photo').value;
-                await updateProfile(auth.currentUser, { displayName: name, photoURL: photo });
-                const bSnap = await getDocs(query(collection(db, "books"), where("sellerId", "==", currentUser.uid)));
-                const cSnap = await getDocs(query(collection(db, "comments"), where("userId", "==", currentUser.uid)));
-                await Promise.all([...bSnap.docs.map(d=>updateDoc(doc(db,"books",d.id),{sellerName:name})), ...cSnap.docs.map(d=>updateDoc(doc(db,"comments",d.id),{userName:name, photo}))]);
-                alert("Sukses!"); location.reload();
-            } catch(e) { alert(e.message); btn.innerText="Simpan"; }
+        
+        window.openEditModal = (id) => { 
+            closeDetail(); 
+            editingBookId = id; 
+            const b = booksCache.find(x => x.id == id); 
+            
+            document.getElementById('input-title').value = b.title; 
+            document.getElementById('input-price').value = b.price; 
+            document.getElementById('input-stock').value = b.stock; 
+            document.getElementById('input-desc').value = b.desc; 
+            document.getElementById('input-wa').value = b.wa; 
+            document.getElementById('input-image').value = b.image; 
+            
+            document.getElementById('modal-title').innerText = "Edit Buku";
+            document.getElementById('btn-submit-form').innerText = "Simpan Perubahan";
+            document.getElementById('modal-add').classList.remove('hidden'); 
         };
 
-        window.searchBook = () => { const v=document.getElementById('searchInput').value.toLowerCase(); for(let x of document.getElementById('book-list').children) x.style.display=x.innerText.toLowerCase().includes(v)?"":"none"; };
+        // Update Profil dan Semua Data Lama (Batch Update)
+        window.updateUserProfile = async (e) => {
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-save-profile'); 
+            btn.innerText = "Menyimpan...";
+            
+            try {
+                const name = document.getElementById('profile-name').value; 
+                const photo = document.getElementById('profile-photo').value;
+                
+                // 1. Update Auth
+                await updateProfile(auth.currentUser, { displayName: name, photoURL: photo });
+                
+                // 2. Cari & Update Buku Lama
+                const bSnap = await getDocs(query(collection(db, "books"), where("sellerId", "==", currentUser.uid)));
+                
+                // 3. Cari & Update Komentar Lama
+                const cSnap = await getDocs(query(collection(db, "comments"), where("userId", "==", currentUser.uid)));
+                
+                // Eksekusi Semua Update
+                await Promise.all([
+                    ...bSnap.docs.map(d => updateDoc(doc(db,"books",d.id), { sellerName: name })), 
+                    ...cSnap.docs.map(d => updateDoc(doc(db,"comments",d.id), { userName: name, photo: photo }))
+                ]);
+                
+                alert("Profil dan data lama berhasil diperbarui!"); 
+                location.reload();
+            } catch(e) { 
+                alert(e.message); 
+                btn.innerText = "Simpan"; 
+            }
+        };
+
+        // Fitur Cari Buku
+        window.searchBook = () => { 
+            const v = document.getElementById('searchInput').value.toLowerCase(); 
+            const items = document.getElementById('book-list').children;
+            for(let item of items) {
+                const title = item.innerText.toLowerCase();
+                item.style.display = title.includes(v) ? "" : "none";
+            }
+        };
+
+        // Jalankan saat pertama kali
         renderBooks();
     </script>
 </body>
