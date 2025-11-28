@@ -15,27 +15,26 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        /* Animasi Loading */
         .loader { border-top-color: #059669; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Efek Modal */
         .modal-enter { animation: fade-in 0.3s ease-out forwards; }
         @keyframes fade-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        /* Animasi Chat Masuk */
+        .chat-pop { animation: pop-up 0.3s ease-out forwards; }
+        @keyframes pop-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800 pb-24">
 
-    <!-- === NAVBAR (Full Width) === -->
+    <!-- === NAVBAR === -->
     <nav class="bg-white shadow-sm sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
                 <div class="bg-emerald-600 text-white p-1.5 rounded-lg"><i class="fas fa-book-open"></i></div>
                 <span class="font-bold text-lg text-emerald-900">KampusBook</span>
             </div>
-            <div id="auth-container">
-                <!-- Tombol Login / Profil User -->
-            </div>
+            <div id="auth-container"></div>
         </div>
     </nav>
 
@@ -43,10 +42,9 @@
     <header class="bg-emerald-600 text-white pt-10 pb-16 px-4 rounded-b-[2rem] md:rounded-b-[3rem] shadow-md -mb-10 relative z-0">
         <div class="max-w-4xl mx-auto text-center">
             <h1 class="text-3xl md:text-4xl font-bold mb-2">Bursa Buku Mahasiswa</h1>
-            <p class="text-emerald-100 text-sm md:text-base mb-8">Platform jual beli buku bekas khusus mahasiswa. Hemat, Cepat, Terpercaya.</p>
-            
+            <p class="text-emerald-100 text-sm md:text-base mb-8">Platform jual beli buku bekas khusus mahasiswa.</p>
             <div class="relative max-w-xl mx-auto">
-                <input type="text" id="searchInput" onkeyup="searchBook()" placeholder="Cari judul buku, pengarang, atau matkul..." 
+                <input type="text" id="searchInput" onkeyup="searchBook()" placeholder="Cari judul buku..." 
                     class="w-full py-3.5 pl-12 pr-4 rounded-full text-gray-700 shadow-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 transition border-0">
                 <i class="fas fa-search absolute left-5 top-4 text-gray-400 text-lg"></i>
             </div>
@@ -57,20 +55,10 @@
     <main class="max-w-6xl mx-auto px-4 mt-14 relative z-10">
         <div class="flex justify-between items-center mb-6">
             <h2 class="font-bold text-xl text-gray-800 border-l-4 border-emerald-500 pl-3">Katalog Terbaru</h2>
-            <button onclick="renderBooks()" class="text-sm text-emerald-600 font-bold hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition">
-                <i class="fas fa-sync mr-1"></i> Refresh
-            </button>
+            <button onclick="renderBooks()" class="text-sm text-emerald-600 font-bold hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition"><i class="fas fa-sync mr-1"></i> Refresh</button>
         </div>
-        
-        <!-- Loading Spinner -->
-        <div id="loading" class="flex justify-center py-20 hidden">
-            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div>
-        </div>
-
-        <!-- Grid Buku -->
-        <div id="book-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-10">
-            <!-- Item buku dirender JS -->
-        </div>
+        <div id="loading" class="flex justify-center py-20 hidden"><div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div></div>
+        <div id="book-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-10"></div>
     </main>
 
     <!-- === TOMBOL FLOATING (JUAL) === -->
@@ -80,111 +68,74 @@
         </button>
     </div>
 
-    <!-- === MODAL 1: FORM JUAL/EDIT BUKU === -->
+    <!-- === MODAL JUAL/EDIT === -->
     <div id="modal-add" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative modal-enter">
             <div class="flex justify-between items-center mb-5 border-b pb-3">
                 <h3 id="modal-title" class="font-bold text-xl text-gray-800">Jual Buku Baru</h3>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
             </div>
-            
             <form id="form-jual" onsubmit="handleFormSubmit(event)">
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Judul Buku</label>
-                        <input type="text" id="input-title" placeholder="Contoh: Kalkulus Purcel Edisi 9" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                    </div>
-                    
+                    <div><label class="text-xs font-bold text-gray-500">Judul</label><input type="text" id="input-title" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required></div>
                     <div class="grid grid-cols-3 gap-3">
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Harga (Rp)</label>
-                            <input type="number" id="input-price" placeholder="50000" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Stok</label>
-                            <input type="number" id="input-stock" value="1" min="1" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                        </div>
+                        <div class="col-span-2"><label class="text-xs font-bold text-gray-500">Harga (Rp)</label><input type="number" id="input-price" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
+                        <div><label class="text-xs font-bold text-gray-500">Stok</label><input type="number" id="input-stock" value="1" min="1" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">WhatsApp (628...)</label>
-                        <input type="text" id="input-wa" placeholder="08123456789" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Deskripsi & Kondisi</label>
-                        <textarea id="input-desc" placeholder="Jelaskan kondisi buku, minus, atau lokasi COD..." class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" rows="3" required></textarea>
-                    </div>
-                    
-                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                        <label class="block text-xs font-bold text-blue-800 mb-1">Link Foto Buku (URL)</label>
-                        <input type="url" id="input-image" placeholder="https://..." class="w-full border p-2 rounded text-sm bg-white focus:outline-none" required>
-                        <p class="text-[10px] text-blue-600 mt-1">*Buka Google Images -> Klik Kanan Gambar -> Copy Image Address -> Paste disini.</p>
-                    </div>
+                    <div><label class="text-xs font-bold text-gray-500">WhatsApp (628..)</label><input type="text" id="input-wa" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
+                    <div><label class="text-xs font-bold text-gray-500">Deskripsi</label><textarea id="input-desc" class="w-full border p-2.5 rounded-lg text-sm outline-none" rows="3" required></textarea></div>
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100"><label class="text-xs font-bold text-blue-800">URL Foto</label><input type="url" id="input-image" class="w-full border p-2 rounded text-sm bg-white" required><p class="text-[10px] text-blue-600 mt-1">*Copy Image Address dari Google.</p></div>
                 </div>
-
-                <button type="submit" id="btn-submit-form" class="w-full mt-6 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
-                    Posting Sekarang
-                </button>
+                <button type="submit" id="btn-submit-form" class="w-full mt-6 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition shadow-lg">Posting</button>
             </form>
         </div>
     </div>
 
-    <!-- === MODAL 2: DETAIL BUKU & DISKUSI === -->
+    <!-- === MODAL DETAIL & DISKUSI (REALTIME) === -->
     <div id="modal-detail" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center pointer-events-none">
         <div class="absolute inset-0 bg-black bg-opacity-60 pointer-events-auto transition-opacity backdrop-blur-sm" onclick="closeDetail()"></div>
-        
-        <div class="bg-white w-full max-w-4xl h-[90vh] sm:h-[80vh] sm:rounded-2xl rounded-t-3xl shadow-2xl relative pointer-events-auto flex flex-col sm:flex-row overflow-hidden modal-enter">
-            <!-- Kiri: Gambar & Info Utama -->
-            <div class="w-full sm:w-1/2 bg-gray-50 flex flex-col h-full overflow-y-auto border-r">
+        <div class="bg-white w-full max-w-4xl h-[90vh] sm:h-[85vh] sm:rounded-2xl rounded-t-3xl shadow-2xl relative pointer-events-auto flex flex-col sm:flex-row overflow-hidden modal-enter">
+            
+            <!-- Kiri: Info Buku -->
+            <div class="w-full sm:w-1/2 bg-gray-50 flex flex-col h-full overflow-y-auto border-r hide-scrollbar">
                 <div class="relative h-64 sm:h-80 bg-gray-200 shrink-0">
                     <img id="detail-img" src="" class="w-full h-full object-cover">
                     <button onclick="closeDetail()" class="absolute top-4 left-4 sm:hidden w-8 h-8 rounded-full bg-white/80 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
                 </div>
-                
                 <div class="p-6 flex-1">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider">Buku Bekas</span>
-                        <span id="detail-stock" class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-1 rounded">Stok: 1</span>
-                    </div>
-                    
-                    <h2 id="detail-title" class="text-2xl font-bold text-gray-900 leading-tight mb-2">Judul Buku</h2>
+                    <div class="flex justify-between items-start mb-2"><span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded">BUKU BEKAS</span><span id="detail-stock" class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-1 rounded">Stok: 1</span></div>
+                    <h2 id="detail-title" class="text-2xl font-bold text-gray-900 leading-tight mb-2">Judul</h2>
                     <p id="detail-price" class="text-3xl font-bold text-emerald-600 mb-4">Rp 0</p>
-                    
-                    <div class="flex items-center gap-3 mb-6 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500"><i class="fas fa-user"></i></div>
-                        <div>
-                            <p class="text-xs text-gray-500">Penjual</p>
-                            <p id="detail-seller" class="font-bold text-gray-800 text-sm">Nama Penjual</p>
-                        </div>
+                    <div class="flex items-center gap-3 mb-6 bg-white p-3 rounded-xl border shadow-sm">
+                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"><i class="fas fa-user text-gray-500"></i></div>
+                        <div><p class="text-xs text-gray-500">Penjual</p><p id="detail-seller" class="font-bold text-gray-800 text-sm">Nama</p></div>
                     </div>
-
-                    <div class="prose prose-sm text-gray-600 mb-6">
-                        <h4 class="font-bold text-gray-900 mb-1">Deskripsi</h4>
-                        <p id="detail-desc" class="whitespace-pre-line">...</p>
-                    </div>
-
+                    <div class="prose prose-sm text-gray-600 mb-6"><h4 class="font-bold text-gray-900 mb-1">Deskripsi</h4><p id="detail-desc" class="whitespace-pre-line">...</p></div>
                     <div id="detail-actions" class="mt-auto space-y-3">
-                        <a id="btn-wa" href="#" target="_blank" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-green-200 transition">
-                            <i class="fab fa-whatsapp text-lg mr-1"></i> Hubungi Penjual
-                        </a>
+                        <a id="btn-wa" href="#" target="_blank" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg transition"><i class="fab fa-whatsapp text-lg mr-1"></i> Hubungi Penjual</a>
                         <div id="owner-actions" class="grid grid-cols-2 gap-2 hidden"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Kanan: Diskusi -->
-            <div class="w-full sm:w-1/2 flex flex-col h-full bg-white relative">
-                <div class="p-4 border-b flex justify-between items-center shadow-sm z-10">
+            <!-- Kanan: Chat (Realtime & Smooth) -->
+            <div class="w-full sm:w-1/2 flex flex-col h-full bg-[#efeae2] relative"> <!-- Background ala WA -->
+                <div class="p-3 border-b bg-white flex justify-between items-center shadow-sm z-10">
                     <h3 class="font-bold text-gray-700 flex items-center gap-2"><i class="far fa-comments text-emerald-500"></i> Diskusi Publik</h3>
                     <button onclick="closeDetail()" class="hidden sm:block text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
                 </div>
-                <div id="comments-list" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50"></div>
-                <div class="p-4 border-t bg-white">
+                
+                <!-- Area Chat -->
+                <div id="comments-list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-opacity-10">
+                    <!-- Chat masuk disini -->
+                </div>
+
+                <!-- Input Area (Fixed Bottom) -->
+                <div class="p-3 bg-white">
                     <div class="flex gap-2 items-center bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition">
-                        <input type="text" id="input-comment" placeholder="Tanyakan kondisi buku..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1.5 outline-none">
-                        <button onclick="postComment()" class="bg-emerald-600 text-white w-8 h-8 rounded-full hover:bg-emerald-700 flex items-center justify-center transition shadow-md">
-                            <i class="fas fa-paper-plane text-xs"></i>
+                        <input type="text" id="input-comment" placeholder="Ketik pesan..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1.5 outline-none" autocomplete="off">
+                        <button onclick="postComment()" class="text-emerald-600 hover:text-emerald-700 w-8 h-8 flex items-center justify-center transition">
+                            <i class="fas fa-paper-plane text-lg"></i>
                         </button>
                     </div>
                 </div>
@@ -192,49 +143,27 @@
         </div>
     </div>
 
-    <!-- === MODAL 3: EDIT PROFIL USER === -->
+    <!-- === MODAL EDIT PROFIL === -->
     <div id="modal-profile" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm px-4">
         <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl relative modal-enter">
-            <div class="flex justify-between items-center mb-5 border-b pb-3">
-                <h3 class="font-bold text-xl text-gray-800">Profil Saya</h3>
-                <button onclick="closeProfileModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div class="flex flex-col items-center mb-6">
-                <img id="profile-preview" src="" class="w-20 h-20 rounded-full border-2 border-emerald-500 object-cover shadow-md mb-2">
-                <p id="profile-email" class="text-xs text-gray-500">email@example.com</p>
-            </div>
-
+            <div class="flex justify-between items-center mb-5 border-b pb-3"><h3 class="font-bold text-xl text-gray-800">Profil Saya</h3><button onclick="closeProfileModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:text-red-500 flex items-center justify-center"><i class="fas fa-times"></i></button></div>
+            <div class="flex flex-col items-center mb-6"><img id="profile-preview" src="" class="w-20 h-20 rounded-full border-2 border-emerald-500 object-cover shadow-md mb-2"><p id="profile-email" class="text-xs text-gray-500">email</p></div>
             <form onsubmit="updateUserProfile(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Nama Tampilan</label>
-                    <input type="text" id="profile-name" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">URL Foto Profil</label>
-                    <input type="url" id="profile-photo" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="https://...">
-                    <p class="text-[10px] text-gray-400 mt-1">*Gunakan link gambar dari internet</p>
-                </div>
-
-                <button type="submit" id="btn-save-profile" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition">
-                    Simpan Perubahan
-                </button>
+                <div><label class="text-xs font-bold text-gray-500">Nama</label><input type="text" id="profile-name" class="w-full border p-2.5 rounded-lg text-sm outline-none" required></div>
+                <div><label class="text-xs font-bold text-gray-500">URL Foto</label><input type="url" id="profile-photo" class="w-full border p-2.5 rounded-lg text-sm outline-none"></div>
+                <button type="submit" id="btn-save-profile" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition">Simpan</button>
             </form>
-
-            <button onclick="logout()" class="w-full mt-3 py-2.5 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">
-                <i class="fas fa-sign-out-alt mr-2"></i> Keluar / Logout
-            </button>
+            <button onclick="logout()" class="w-full mt-3 py-2.5 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">Logout</button>
         </div>
     </div>
 
     <!-- === JAVASCRIPT === -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // IMPORT onSnapshot (PENTING untuk Real-time)
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, orderBy, where, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- CONFIG ---
+        // --- PASTE CONFIG FIREBASE ANDA DISINI ---
         const firebaseConfig = {
             apiKey: "AIzaSyCc7QR0H2NwywGX2ld3f-CQOwxo39WWu08",
             authDomain: "campusbook-416b9.firebaseapp.com",
@@ -253,295 +182,185 @@
         let booksCache = []; 
         let activeBookId = null;
         let editingBookId = null; 
-        let unsubscribeComments = null; // Variabel untuk menyimpan listener chat
+        let unsubscribeComments = null;
 
         // --- AUTH ---
         window.loginGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message) } };
-        
-        window.logout = () => { 
-            if(confirm("Yakin ingin logout?")) { 
-                signOut(auth); 
-                location.reload(); 
-            } 
-        };
-
-        // --- PROFILE ---
-        window.openProfileModal = () => {
-            if(!currentUser) return;
-            document.getElementById('profile-name').value = currentUser.displayName;
-            document.getElementById('profile-photo').value = currentUser.photoURL;
-            document.getElementById('profile-preview').src = currentUser.photoURL;
-            document.getElementById('profile-email').innerText = currentUser.email;
-            document.getElementById('modal-profile').classList.remove('hidden');
-        };
-
-        window.closeProfileModal = () => document.getElementById('modal-profile').classList.add('hidden');
-
-        window.updateUserProfile = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-profile');
-            const newName = document.getElementById('profile-name').value;
-            const newPhoto = document.getElementById('profile-photo').value;
-
-            btn.innerText = "Sedang Memperbarui Data Lama...";
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-
-            try {
-                await updateProfile(auth.currentUser, { displayName: newName, photoURL: newPhoto });
-
-                const booksRef = collection(db, "books");
-                const qBooks = query(booksRef, where("sellerId", "==", currentUser.uid));
-                const booksSnap = await getDocs(qBooks);
-                const bookUpdates = booksSnap.docs.map(docSnap => updateDoc(doc(db, "books", docSnap.id), { sellerName: newName }));
-
-                const commentsRef = collection(db, "comments");
-                const qComments = query(commentsRef, where("userId", "==", currentUser.uid));
-                const commentsSnap = await getDocs(qComments);
-                const commentUpdates = commentsSnap.docs.map(docSnap => updateDoc(doc(db, "comments", docSnap.id), { userName: newName, photo: newPhoto }));
-
-                await Promise.all([...bookUpdates, ...commentUpdates]);
-                alert("Profil berhasil diperbarui!");
-                location.reload(); 
-
-            } catch (error) {
-                alert("Gagal: " + error.message);
-                btn.innerText = "Simpan Perubahan";
-                btn.disabled = false;
-                btn.classList.remove('opacity-50');
-            }
-        };
+        window.logout = () => { if(confirm("Yakin logout?")) { signOut(auth); location.reload(); } };
 
         onAuthStateChanged(auth, (user) => {
             const container = document.getElementById('auth-container');
             const btnAdd = document.getElementById('btn-add-book');
             if (user) {
                 currentUser = user;
-                container.innerHTML = `
-                    <div onclick="openProfileModal()" class="flex items-center gap-3 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 transition">
-                        <div class="text-right hidden md:block">
-                            <p class="text-xs font-bold text-emerald-900 leading-tight">${user.displayName.split(' ')[0]}</p>
-                            <p class="text-[10px] text-emerald-600 leading-tight">Edit Profil</p>
-                        </div>
-                        <img src="${user.photoURL}" class="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover">
-                    </div>`;
+                container.innerHTML = `<div onclick="openProfileModal()" class="flex items-center gap-3 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 transition"><div class="text-right hidden md:block"><p class="text-xs font-bold text-emerald-900">${user.displayName.split(' ')[0]}</p><p class="text-[10px] text-emerald-600">Edit Profil</p></div><img src="${user.photoURL}" class="w-8 h-8 rounded-full border-2 border-white object-cover"></div>`;
                 btnAdd.style.display = 'block';
             } else {
                 currentUser = null;
-                container.innerHTML = `
-                    <button onclick="loginGoogle()" class="text-sm font-bold text-white bg-emerald-600 px-5 py-2 rounded-full hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
-                        <i class="fab fa-google mr-2"></i> Masuk
-                    </button>`;
+                container.innerHTML = `<button onclick="loginGoogle()" class="text-sm font-bold text-white bg-emerald-600 px-5 py-2 rounded-full hover:bg-emerald-700 shadow-lg"><i class="fab fa-google mr-2"></i> Masuk</button>`;
                 btnAdd.style.display = 'none';
             }
         });
 
-        // --- RENDER BUKU ---
+        // --- BOOKS ---
         window.renderBooks = async () => {
             const list = document.getElementById('book-list');
             const loader = document.getElementById('loading');
-            list.innerHTML = '';
-            loader.classList.remove('hidden');
-
+            list.innerHTML = ''; loader.classList.remove('hidden');
             try {
                 const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
-                // Gunakan Real-time juga untuk List Buku jika mau, tapi getDocs juga oke untuk list
                 const snap = await getDocs(q);
                 loader.classList.add('hidden');
-                booksCache = []; 
-
-                if (snap.empty) {
-                    list.innerHTML = `<div class="col-span-full text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300"><p class="text-gray-500">Belum ada buku.</p></div>`;
-                    return;
-                }
-
+                booksCache = [];
+                if (snap.empty) { list.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">Belum ada buku.</div>`; return; }
                 snap.forEach((docSnap) => {
-                    const book = docSnap.data();
-                    const id = docSnap.id;
-                    booksCache.push({ id, ...book }); 
-
-                    const stockDisplay = book.stock > 0 ? `<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Stok: ${book.stock}</span>` : `<span class="text-[10px] text-white bg-red-500 px-2 py-1 rounded-full">Habis</span>`;
-
-                    const html = `
-                        <div onclick="openDetail('${id}')" class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-gray-100 flex flex-col h-full group">
-                            <div class="aspect-[3/4] bg-gray-100 rounded-xl mb-3 overflow-hidden relative">
-                                <img src="${book.image}" onerror="this.src='https://placehold.co/400x600?text=No+Image'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            </div>
-                            <h3 class="font-bold text-sm text-gray-800 line-clamp-2 leading-tight mb-1 group-hover:text-emerald-600 transition">${book.title}</h3>
-                            <p class="text-xs text-gray-500 mb-2 truncate">${book.sellerName}</p>
-                            <div class="mt-auto flex justify-between items-center pt-2 border-t border-gray-50">
-                                <span class="text-emerald-600 font-bold text-sm">Rp ${parseInt(book.price).toLocaleString('id-ID')}</span>
-                                ${stockDisplay}
-                            </div>
-                        </div>`;
-                    list.innerHTML += html;
+                    const b = docSnap.data(); const id = docSnap.id; booksCache.push({ id, ...b });
+                    const stk = b.stock > 0 ? `<span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Stok: ${b.stock}</span>` : `<span class="text-[10px] text-white bg-red-500 px-2 py-1 rounded-full">Habis</span>`;
+                    list.innerHTML += `<div onclick="openDetail('${id}')" class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer border flex flex-col h-full group"><div class="aspect-[3/4] bg-gray-100 rounded-xl mb-3 overflow-hidden relative"><img src="${b.image}" onerror="this.src='https://placehold.co/400x600?text=No+Image'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></div><h3 class="font-bold text-sm text-gray-800 line-clamp-2 mb-1 group-hover:text-emerald-600">${b.title}</h3><p class="text-xs text-gray-500 mb-2 truncate">${b.sellerName}</p><div class="mt-auto flex justify-between items-center pt-2 border-t">${stk}<span class="text-emerald-600 font-bold text-sm">Rp ${parseInt(b.price).toLocaleString('id-ID')}</span></div></div>`;
                 });
-            } catch (error) { console.error(error); loader.classList.add('hidden'); }
+            } catch (e) { console.error(e); loader.classList.add('hidden'); }
         };
 
-        // --- OPEN DETAIL ---
+        // --- DETAIL & REALTIME CHAT (FIXED) ---
         window.openDetail = (id) => {
             activeBookId = id;
-            const book = booksCache.find(b => b.id === id);
-            if(!book) return;
+            const b = booksCache.find(x => x.id === id);
+            if(!b) return;
 
-            document.getElementById('detail-img').src = book.image;
-            document.getElementById('detail-title').innerText = book.title;
-            document.getElementById('detail-price').innerText = `Rp ${parseInt(book.price).toLocaleString('id-ID')}`;
-            document.getElementById('detail-desc').innerText = book.desc;
-            document.getElementById('detail-seller').innerText = book.sellerName;
-            document.getElementById('detail-stock').innerText = `Stok: ${book.stock || 1}`;
-            document.getElementById('btn-wa').href = `https://wa.me/${book.wa}?text=Halo, saya tertarik buku: ${book.title}`;
+            document.getElementById('detail-img').src = b.image;
+            document.getElementById('detail-title').innerText = b.title;
+            document.getElementById('detail-price').innerText = `Rp ${parseInt(b.price).toLocaleString('id-ID')}`;
+            document.getElementById('detail-desc').innerText = b.desc;
+            document.getElementById('detail-seller').innerText = b.sellerName;
+            document.getElementById('detail-stock').innerText = `Stok: ${b.stock || 1}`;
+            document.getElementById('btn-wa').href = `https://wa.me/${b.wa}?text=Halo, tertarik buku: ${b.title}`;
 
-            const ownerActions = document.getElementById('owner-actions');
-            ownerActions.classList.add('hidden');
-            ownerActions.innerHTML = '';
-
-            if (currentUser && book.sellerId === currentUser.uid) {
-                ownerActions.classList.remove('hidden');
-                ownerActions.innerHTML = `
-                    <button onclick="openEditModal('${id}')" class="w-full border border-blue-200 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-50 transition text-sm flex items-center justify-center gap-2"><i class="fas fa-edit"></i> Edit</button>
-                    <button onclick="deleteBook('${id}')" class="w-full border border-red-200 text-red-500 py-3 rounded-xl font-bold hover:bg-red-50 transition text-sm flex items-center justify-center gap-2"><i class="fas fa-trash"></i> Hapus</button>
-                `;
+            const actions = document.getElementById('owner-actions');
+            actions.innerHTML = ''; actions.classList.add('hidden');
+            if (currentUser && b.sellerId === currentUser.uid) {
+                actions.classList.remove('hidden');
+                actions.innerHTML = `<button onclick="openEditModal('${id}')" class="w-full border border-blue-200 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-50 text-sm flex items-center justify-center gap-2"><i class="fas fa-edit"></i> Edit</button><button onclick="deleteBook('${id}')" class="w-full border border-red-200 text-red-500 py-3 rounded-xl font-bold hover:bg-red-50 text-sm flex items-center justify-center gap-2"><i class="fas fa-trash"></i> Hapus</button>`;
             }
-
             document.getElementById('modal-detail').classList.remove('hidden', 'pointer-events-none');
-            
-            // PANGGIL FUNGSI REAL-TIME BARU
             loadCommentsRealtime(id);
         };
 
         window.closeDetail = () => {
             document.getElementById('modal-detail').classList.add('hidden', 'pointer-events-none');
             activeBookId = null;
-            
-            // MATIKAN LISTENER SAAT MODAL DITUTUP (Hemat Kuota)
-            if (unsubscribeComments) {
-                unsubscribeComments();
-                unsubscribeComments = null;
-            }
+            if (unsubscribeComments) { unsubscribeComments(); unsubscribeComments = null; }
         };
 
-        // --- DISKUSI (REAL-TIME UPDATE) ---
+        // --- LOGIKA CHAT WA-STYLE ---
         function loadCommentsRealtime(bookId) {
             const container = document.getElementById('comments-list');
             container.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Memuat diskusi...</div>';
 
-            // Bersihkan listener lama jika ada
             if (unsubscribeComments) unsubscribeComments();
 
-            // Query Komentar
             const q = query(collection(db, "comments"), where("bookId", "==", bookId));
 
-            // MENGGUNAKAN onSnapshot (BUKAN getDocs)
             unsubscribeComments = onSnapshot(q, (snap) => {
                 container.innerHTML = '';
                 if(snap.empty) {
-                    container.innerHTML = '<div class="flex flex-col items-center justify-center h-40 text-gray-400 text-xs"><i class="far fa-comment-dots text-2xl mb-2 opacity-50"></i>Belum ada diskusi</div>';
+                    container.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-xs"><i class="far fa-comment-dots text-3xl mb-2 opacity-30"></i>Mulai obrolan...</div>';
                     return;
                 }
 
                 const comments = [];
                 snap.forEach(doc => comments.push({ id: doc.id, ...doc.data() }));
                 
-                // Sorting di Client Side
-                comments.sort((a, b) => a.createdAt - b.createdAt);
-                
+                // FIX: Menangani Timestamp yang null saat pertama kirim (Local Latency)
+                comments.sort((a, b) => {
+                    const timeA = a.createdAt ? a.createdAt.toMillis() : Date.now();
+                    const timeB = b.createdAt ? b.createdAt.toMillis() : Date.now();
+                    return timeA - timeB;
+                });
+
                 comments.forEach(c => {
                     const isMe = currentUser && c.userId === currentUser.uid;
-                    const deleteBtn = isMe ? `<button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-500 p-1 transition opacity-0 group-hover:opacity-100" title="Hapus"><i class="fas fa-trash text-[10px]"></i></button>` : '';
+                    const time = c.createdAt ? new Date(c.createdAt.toMillis()).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '...';
+                    
+                    const deleteBtn = isMe ? `<i onclick="deleteComment('${c.id}')" class="fas fa-trash text-[10px] text-gray-300 hover:text-red-500 cursor-pointer ml-2 opacity-0 group-hover:opacity-100 transition"></i>` : '';
 
                     container.innerHTML += `
-                        <div class="flex gap-2 ${isMe ? 'flex-row-reverse' : ''} animate-fade-in group items-end">
-                            <img src="${c.photo || 'https://via.placeholder.com/30'}" class="w-8 h-8 rounded-full border bg-gray-200 object-cover shrink-0">
-                            <div class="max-w-[80%]">
-                                <div class="px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm ${isMe ? 'bg-emerald-100 text-emerald-900 rounded-tr-none' : 'bg-white text-gray-700 rounded-tl-none border'}">
-                                    <span class="font-bold block text-[10px] mb-0.5 opacity-60">${c.userName}</span>
-                                    ${c.text}
+                        <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2 chat-pop group">
+                            <div class="flex items-end max-w-[85%] ${isMe ? 'flex-row-reverse' : 'flex-row'} gap-2">
+                                ${!isMe ? `<img src="${c.photo||'https://via.placeholder.com/30'}" class="w-6 h-6 rounded-full border bg-white mb-1">` : ''}
+                                <div class="px-3 py-2 rounded-2xl text-sm shadow-sm relative ${isMe ? 'bg-emerald-100 text-emerald-900 rounded-tr-none' : 'bg-white text-gray-800 rounded-tl-none border'}">
+                                    ${!isMe ? `<span class="block text-[10px] font-bold text-emerald-600 mb-0.5">${c.userName}</span>` : ''}
+                                    <span class="leading-relaxed">${c.text}</span>
+                                    <div class="text-[9px] text-right mt-1 opacity-50 flex justify-end items-center gap-1">
+                                        ${time} ${deleteBtn}
+                                    </div>
                                 </div>
                             </div>
-                            ${deleteBtn}
                         </div>`;
                 });
-                // Auto Scroll ke bawah
-                setTimeout(() => container.scrollTop = container.scrollHeight, 100);
+                
+                // AUTO SCROLL KE BAWAH
+                setTimeout(() => container.scrollTop = container.scrollHeight, 50);
             });
         }
+
+        // --- SEND WITH ENTER KEY ---
+        document.getElementById('input-comment').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                postComment();
+            }
+        });
 
         window.postComment = async () => {
             if(!currentUser) return alert("Login dulu!");
             const input = document.getElementById('input-comment');
             const text = input.value.trim();
             if(!text) return;
+            
+            // Langsung kosongkan input agar terasa cepat (Optimistic UI)
+            input.value = ''; 
+            input.focus();
+
             try {
-                // Tidak perlu panggil loadComments lagi karena onSnapshot otomatis mendeteksi perubahan
                 await addDoc(collection(db, "comments"), {
                     bookId: activeBookId, userId: currentUser.uid, userName: currentUser.displayName,
                     photo: currentUser.photoURL, text: text, createdAt: serverTimestamp()
                 });
-                input.value = ''; 
-            } catch (e) { alert("Gagal: " + e.message); }
+            } catch (e) { alert("Gagal kirim"); }
         };
 
-        window.deleteComment = async (id) => {
-            if(!confirm("Hapus komentar?")) return;
-            try { await deleteDoc(doc(db, "comments", id)); } 
-            catch (e) { alert("Gagal hapus: " + e.message); }
-        };
-
-        // --- CRUD BUKU ---
-        window.openAddModal = () => {
-            editingBookId = null;
-            document.getElementById('form-jual').reset();
-            document.getElementById('modal-title').innerText = "Jual Buku Baru";
-            document.getElementById('btn-submit-form').innerText = "Posting Sekarang";
-            document.getElementById('modal-add').classList.remove('hidden');
-        };
-
-        window.openEditModal = (id) => {
-            closeDetail();
-            editingBookId = id;
-            const book = booksCache.find(b => b.id === id);
-            if(!book) return;
-            document.getElementById('input-title').value = book.title;
-            document.getElementById('input-price').value = book.price;
-            document.getElementById('input-desc').value = book.desc;
-            document.getElementById('input-wa').value = book.wa;
-            document.getElementById('input-image').value = book.image;
-            document.getElementById('input-stock').value = book.stock || 1;
-            document.getElementById('modal-title').innerText = "Edit Buku";
-            document.getElementById('btn-submit-form').innerText = "Simpan Perubahan";
-            document.getElementById('modal-add').classList.remove('hidden');
-        };
-
-        window.closeModal = () => document.getElementById('modal-add').classList.add('hidden');
-
+        // --- CRUD LAINNYA ---
+        window.deleteComment = async (id) => { if(confirm("Hapus?")) await deleteDoc(doc(db, "comments", id)); };
+        window.deleteBook = async (id) => { if(confirm("Hapus buku?")) { await deleteDoc(doc(db, "books", id)); closeDetail(); renderBooks(); }};
+        
         window.handleFormSubmit = async (e) => {
-            e.preventDefault();
-            if(!currentUser) return alert("Login dulu!");
+            e.preventDefault(); if(!currentUser) return alert("Login!");
             const vals = ['title', 'price', 'stock', 'desc', 'wa', 'image'].map(id => document.getElementById('input-'+id).value);
             let wa = vals[4].replace(/\D/g,''); if(wa.startsWith('0')) wa = '62'+wa.substring(1);
-            const bookData = { title: vals[0], price: Number(vals[1]), stock: Number(vals[2]), desc: vals[3], wa: wa, image: vals[5], sellerId: currentUser.uid, sellerName: currentUser.displayName, updatedAt: serverTimestamp() };
+            const d = { title: vals[0], price: Number(vals[1]), stock: Number(vals[2]), desc: vals[3], wa, image: vals[5], sellerId: currentUser.uid, sellerName: currentUser.displayName, updatedAt: serverTimestamp() };
+            try { editingBookId ? await updateDoc(doc(db, "books", editingBookId), d) : (d.createdAt=serverTimestamp(), await addDoc(collection(db, "books"), d)); closeModal(); renderBooks(); } catch(e) { alert(e.message); }
+        };
 
+        // --- PROFILE UPDATE (BATCH) ---
+        window.openProfileModal = () => { document.getElementById('profile-name').value=currentUser.displayName; document.getElementById('profile-photo').value=currentUser.photoURL; document.getElementById('profile-preview').src=currentUser.photoURL; document.getElementById('profile-email').innerText=currentUser.email; document.getElementById('modal-profile').classList.remove('hidden'); };
+        window.closeProfileModal = () => document.getElementById('modal-profile').classList.add('hidden');
+        window.openAddModal = () => { editingBookId=null; document.getElementById('form-jual').reset(); document.getElementById('modal-add').classList.remove('hidden'); };
+        window.closeModal = () => document.getElementById('modal-add').classList.add('hidden');
+        window.openEditModal = (id) => { closeDetail(); editingBookId=id; const b=booksCache.find(x=>x.id==id); document.getElementById('input-title').value=b.title; document.getElementById('input-price').value=b.price; document.getElementById('input-stock').value=b.stock; document.getElementById('input-desc').value=b.desc; document.getElementById('input-wa').value=b.wa; document.getElementById('input-image').value=b.image; document.getElementById('modal-add').classList.remove('hidden'); };
+
+        window.updateUserProfile = async (e) => {
+            e.preventDefault(); const btn=document.getElementById('btn-save-profile'); btn.innerText="Menyimpan...";
             try {
-                if (editingBookId) { await updateDoc(doc(db, "books", editingBookId), bookData); alert("Diperbarui!"); } 
-                else { bookData.createdAt = serverTimestamp(); await addDoc(collection(db, "books"), bookData); alert("Terposting!"); }
-                closeModal(); renderBooks();
-            } catch (err) { alert(err.message); }
+                const name=document.getElementById('profile-name').value; const photo=document.getElementById('profile-photo').value;
+                await updateProfile(auth.currentUser, { displayName: name, photoURL: photo });
+                const bSnap = await getDocs(query(collection(db, "books"), where("sellerId", "==", currentUser.uid)));
+                const cSnap = await getDocs(query(collection(db, "comments"), where("userId", "==", currentUser.uid)));
+                await Promise.all([...bSnap.docs.map(d=>updateDoc(doc(db,"books",d.id),{sellerName:name})), ...cSnap.docs.map(d=>updateDoc(doc(db,"comments",d.id),{userName:name, photo}))]);
+                alert("Sukses!"); location.reload();
+            } catch(e) { alert(e.message); btn.innerText="Simpan"; }
         };
 
-        window.deleteBook = async (id) => {
-            if(!confirm("Hapus permanen?")) return;
-            try { await deleteDoc(doc(db, "books", id)); alert("Terhapus"); closeDetail(); renderBooks(); } 
-            catch (e) { alert(e.message); }
-        };
-
-        window.searchBook = () => {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            const items = document.getElementById('book-list').children;
-            for(let item of items) item.style.display = item.innerText.toLowerCase().includes(val) ? "" : "none";
-        }
-
+        window.searchBook = () => { const v=document.getElementById('searchInput').value.toLowerCase(); for(let x of document.getElementById('book-list').children) x.style.display=x.innerText.toLowerCase().includes(v)?"":"none"; };
         renderBooks();
     </script>
 </body>
